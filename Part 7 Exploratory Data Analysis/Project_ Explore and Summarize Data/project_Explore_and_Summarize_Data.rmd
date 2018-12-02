@@ -1,0 +1,586 @@
+---
+title : Explore and Summarize Data/Red Wine Analysis
+output:
+  html_document:
+    toc: true
+---
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+#install.packages("ggplot2", dependencies = T) 
+#install.packages("knitr", dependencies = T)
+#install.packages("dplyr", dependencies = T)
+
+library(ggplot2)
+library(knitr)
+library(dplyr)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+wine <- read.csv('wineQualityReds.csv')
+```
+# Overview
+This anaylysis report is described what are important variables for wine quality.
+wineQualityReds.csv is consist of 13 columns and 1599 row, and each row means one wine
+
+## Understand the meaning of each columns
+We need to understand what the meaning of each column.
+
+1. fixed acidity: most acids involved with wine or fixed or nonvolatile (do not evaporate readily)
+2. volatile acidity: the amount of acetic acid in wine, which at too high of levels can lead to an unpleasant, vinegar taste
+3. citric acid: found in small quantities, citric acid can add 'freshness' and flavor to wines
+4. residual sugar: the amount of sugar remaining after fermentation stops, it's rare to find wines with less than 1 gram/liter and wines with greater than 45 grams/liter are considered sweet
+5. chlorides: the amount of salt in the wine
+6. free sulfur dioxide: the free form of SO2 exists in equilibrium between molecular SO2 (as a dissolved gas) and bisulfite ion; it prevents microbial growth and the oxidation of wine
+7. total sulfur dioxide: amount of free and bound forms of S02; in low concentrations, SO2 is mostly undetectable in wine, but at free SO2 concentrations over 50 ppm, SO2 becomes evident in the nose and taste of wine
+8. density: the density of water is close to that of water depending on the percent alcohol and sugar content
+9. pH: describes how acidic or basic a wine is on a scale from 0 (very acidic) to 14 (very basic); most wines are between 3-4 on the pH scale
+10. sulphates: a wine additive which can contribute to sulfur dioxide gas (S02) levels, wich acts as an antimicrobial and antioxidant
+11. alcohol: the percent alcohol content of the wine
+12. quality (score between 0 and 10)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Cleaning data
+## quality column issue
+Quality column can be cleaned as min is 3, and max is 8. For easy understanding, we can adjust it, min is 1 and max is 6.
+
+```{r quality_column_issue, echo=FALSE}
+summary(wine$quality)
+```
+```{r quality_column_issue_cleaned, echo=FALSE}
+wine$quality = wine$quality - 2
+summary(wine$quality)
+```
+## Quality as a factor
+Change quality to factor from int, is better for analysis below
+```{r quality_as_a_factor, echo=FALSE}
+wine$quality <- factor(wine$quality, ordered = T)
+summary(wine$quality)
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Univariate Plots Section
+
+## Basic distribution of wine/quality
+
+Here is a basic distribution of wine as per its quality, before we do further analysis for multiple variables
+
+ * Most of wine quality is 3 or 4
+ * Small number of win quality is 5 or 6
+     + Quality 1 : 10
+     + Quality 2 : 53
+     + Quality 3 : 681
+     + Quality 4 : 638
+     + Quality 5 : 199
+     + Quality 6 : 18
+
+```{r echo=FALSE, basic_distribution_of_wine_quality}
+ggplot(wine, aes(x = quality, fill=quality)) +
+  geom_bar(width=1, show.legend = FALSE) + 
+  ylab('Number of wine')
+```
+
+## Basic bar chart of wine/pH
+
+Basic distribution of pH, before we analyze further regarding acidity
+
+ * We will revisit the relationship between quality and each acidity
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = pH)) +
+  geom_bar(show.legend = FALSE)
+```
+
+## Historgram of chlorides
+
+This is historgram of chlorides, to know basic distribution of chlorides.
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = chlorides)) +
+  geom_histogram()
+```
+
+## Historgram of sulphates
+
+This is boxplot of sulphates/quality, to know basic distribution of sulphates as per quality.
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = sulphates)) +
+  geom_histogram(binwidt = 0.1)
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Univariate Analysis
+
+## Structure of dataset
+wineQualityReds.csv is consist of around 1600 wines and its 12 attributes.
+I see that most of wines are 3 and 4 quality.
+
+## Analysis / distribution of wine's quality
+ * Mose of wine's quality is 3 and 4
+ * The number of other wine's quality are small count than quality 3 and 4
+
+## Boxplot of pH/quality
+ * Most fo wine's are in the range of pH 3.2 ~ 3.4
+
+## Historgram of sulphates
+ * Most of wine's chlorides is less than 0.1
+
+## Boxplot of sulphates
+ * Many wine's sulphates is less than 0.75
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Bivariate Plots Section
+
+There are some attributes which we don't analyze yet, they are chlorides, sulphates, alcohol and density.
+
+## Summary of chlorides as per quality
+
+According summary() of chlorides as per quality, it seems that it is relaive with quality
+
+```{r echo=FALSE}
+ggplot(wine, aes(x=quality, y=chlorides, color=quality)) +
+  geom_boxplot(show.legend = FALSE) + 
+  ylab('chlorides (g / dm^3)')
+```
+
+## Summary of sulphates as per quality
+
+According summary() of sulphates as per quality, it seems that it is relaive with quality
+
+```{r echo=FALSE}
+ggplot(wine, aes(x=quality, y=sulphates, color=quality)) +
+  geom_boxplot(show.legend = FALSE) +
+  ylab('sulphates (g / dm^3)')
+```
+
+## Relationship between chlorides and sulphates
+
+Here is a relationship between chlorides and sulphates, it seems that there are some outlier.
+
+ * Most of wine's sulphates is < 1.0
+ * Most of wine's chlorides is < 0.15
+ 
+```{r echo=FALSE}
+ggplot(wine, aes(x = chlorides, y = sulphates, color=quality)) +
+  geom_jitter(alpha = 0.25) +
+  geom_hline(yintercept = 1.0, linetype="dotted") +
+  geom_vline(xintercept = 0.15, linetype="dotted") +
+  xlab('chlorides (g / dm^3)') +
+  ylab('sulphates (g / dm^3)')
+```
+
+Before we remove outliers, it seems that chlorides and sulphates have weak positive relationship.
+
+```{r}
+cor.test(wine$chlorides, wine$sulphates)
+```
+
+After we remove outliers, however, we can't see particular relationship from scattrer plot, between chlorides and sulphates.
+It is not easy to observe the difference as per quality. It will be revisited in 'Final plot'
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(wine, aes(x = chlorides, y = sulphates, group=quality , color=quality)) +
+  geom_jitter(alpha = 0.25) +
+  xlim(0, 0.15) +
+  ylim(0, 1.0) +
+  xlab('chlorides (g / dm^3)') +
+  ylab('sulphates (g / dm^3)')
+```
+
+We calculate again without outliers, now, we can see that chlorides and sulphates have no relationship.
+
+```{r}
+wine2 = subset(wine, (chlorides < 0.15) & (sulphates < 1))
+
+cor.test(wine2$chlorides, wine2$sulphates)
+```
+
+## Distribution as per volatile.acidity and qualtiy
+
+As we can see plot below, volatile.acidity have a negative relationship with quality.
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = quality, y = volatile.acidity, color=quality)) +
+  geom_boxplot(show.legend = FALSE) +
+  ylab('volatile.acidity (g / dm^3)')
+```
+
+## Distribution as per fixed.acidity and qualtiy
+
+As we can see plot below, fixed.acidity have no particular relationship with quality.
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = quality, y = fixed.acidity, color=quality)) +
+  geom_boxplot(show.legend = FALSE) +
+  ylab('fixed.acidity (g / dm^3)')
+```
+
+## Distribution as per citric.acid and qualtiy
+
+As we can see plot below, citric.acid have a positive relationship with quality.
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = quality, y = citric.acid, color=quality)) +
+  geom_boxplot(show.legend = FALSE) +
+  ylab('citric.acid (g / dm^3)')
+```
+
+## Distribution as per volatile.acidity/citric.acid and qualtiy
+
+As we observed that volatile.acidity and citric.acid have certain relationship(negative and positive) with quality
+I think that we can put them all together in one plot
+
+ * As volatile.acidity is negative relationship, X -1, to point upper-right, just to easy to understand
+
+```{r echo=FALSE}
+wine$volatile.acidity_1 = wine$volatile.acidity * (-1)
+ggplot(wine, aes(x=volatile.acidity_1, y=citric.acid, color=quality)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = 'lm') +
+  xlab('-1 X volatile.acidity (g / dm^3') +
+  ylab('citric.acid (g / dm^3)')
+```
+
+ * Adding boxplot to know citric.acid movement as per higher quality
+
+```{r echo=FALSE}
+wine$volatile.acidity_1 = wine$volatile.acidity * (-1)
+ggplot(wine, aes(x=volatile.acidity_1, y=citric.acid, color=quality)) +
+  facet_wrap( ~ quality) +
+  geom_point(alpha = 0.2) +
+  geom_boxplot(alpha=0.1) +
+  xlab('-1 X volatile.acidity (g / dm^3)') +
+  ylab('citric.acid (g / dm^3)')
+```
+
+## Relationship between alcohol and density
+
+As alcohol is getting higher, density is getting lower
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = alcohol, y = density)) +
+  geom_point(alpha = 0.3, size=0.7) +
+  geom_smooth(method="lm") +
+  xlab('Alcohol [%]') +
+  ylab('Density (g / cm^3)')
+```
+
+```{r}
+cor.test(wine$alcohol, wine$density)
+```
+
+To observe that same negative relationship is observed after it is grouped by quality
+ * We could observe that same negative relationship in all of quality
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = alcohol, y = density, group=quality, color=quality)) +
+  geom_point(alpha = 0.3, size=0.7) +
+  geom_smooth(method="lm") +
+  xlab('Alcohol [%]') +
+  ylab('Density (g / cm^3)')
+```
+
+To observe cleary as per grouped by quality
+
+```{r echo=FALSE}
+ggplot(wine, aes(x = alcohol, y = density, group=quality, color=quality)) +
+  geom_point(alpha = 0.3, size=0.7) +
+  facet_wrap(~quality) +
+  geom_smooth(method="lm") +
+  xlab('Alcohol [%]') +
+  ylab('Density (g / cm^3)')
+```
+
+Calculated correlation of alcohol/density, as per quality
+
+```{r}
+w6 = subset(wine, quality == 6)
+print('correlation alcohol/density of Quality 6')
+cor.test(w6$alcohol, w6$density)
+```
+
+```{r}
+w5 = subset(wine, quality == 5)
+print('correlation alcohol/density of Quality 5')
+cor.test(w5$alcohol, w5$density)
+```
+
+```{r}
+w4 = subset(wine, quality == 4)
+print('correlation alcohol/density of Quality 4')
+cor.test(w4$alcohol, w4$density)
+```
+
+```{r}
+w3 = subset(wine, quality == 3)
+print('correlation alcohol/density of Quality 3')
+cor.test(w3$alcohol, w3$density)
+```
+
+```{r}
+w2 = subset(wine, quality == 2)
+print('correlation alcohol/density of Quality 2')
+cor.test(w2$alcohol, w2$density)
+```
+
+```{r}
+w1 = subset(wine, quality == 1)
+print('correlation alcohol/density of Quality 1')
+cor.test(w1$alcohol, w1$density)
+```
+
+This plot is to know alcohol/density as per quality, including boxplot of alcohol, to compare alcohol as per quality
+
+```{r}
+ggplot(wine, aes(x=density, y=alcohol, color=quality)) +
+  facet_wrap(~quality) +
+  geom_point(alpha=0.5) +
+  geom_boxplot(alpha=0.1) +
+  ylab('Alcohol [%]') +
+  xlab('Density (g / cm^3)')
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Bivariate Analysis
+
+## Main interest in dataset
+We are going to analysis how each columns impact on wine quality, and relationship between some columns.
+
+ * There are three acidity, volatile.acidity, fixed.acidity and citric.acid.
+   - In the plots above, each acidity impact on quality differently.
+ * Relationship between chlorides and sulphates
+ * Relationship between alcohol and density
+
+### sulphates and quality
+Higher sulphates is observed in higher quality wine
+
+### chlorides and quality
+lower chlorides is observed in higher quality wine
+
+## Relationship between chlorides and sulphates
+ * We might confused that chlorides and sulphates have weak positive relationship
+ * However, after we removed outliers, there is no particular relation between them
+
+## Hypothesis and initial guessing regarding acidity and quality
+Before I analyze 'wineQualityReds.csv' data, my initial guessing is like below
+
+ * As per increasing acidity, quality is increased
+ * If acidity is over certain level, its impact is changed to negative
+ 
+Hoever, the impact on quality is different as per each acidity.
+Even one of them, don't impact on quality
+
+## Analyzed relationship between quality and each acidity
+Unlike initial guessing, each acidity have different impact on quality.
+
+ * volatile.acidity, have a negative relationship with quality
+ * fixed.acidity, seems that it don't impact on quality
+ * citric.acid, have a positive relationship with quality
+
+## Analyzed distribution/relationship as per volatile.acidity/citric.acid and qualtiy
+ * All quality of wine, volatile.acidity/citric have negative relationship
+
+### Unusal distribution of fixed.acidity/quality
+Other acidity(volatile.acidity and citric.acid) have certain relationship regarding quality.
+Even fixed.acidity is one of acidity, it seems that it is not relative with quality
+
+## Relationship between alcohol and density
+ * It is observed that alcohol and density have negative relationship
+ * Quality 6 have higher alcohol than other quality
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Multivariate Plots Section
+
+Previous bivariate analysis, we couldn't find particular relationship between chlorides and sulphates.
+However, it seems that they are still relative with quality.
+So, we are going to figure it out.
+
+## How chlorides and sulphates impact on quality
+If we group chlorides and sulphates as per quality,
+We could observe that there is a relationship regarding chlorides/sulphates and qulaity.
+
+As we summary chlorides after we group by wine quality, we observe that higher qulity wine have less chlorides,
+and its min/max is getting smaller.
+
+```{r chlorides_grouping_by_quality, echo=FALSE}
+wine_b = subset(wine, sulphates < 1.0)
+wine_base = subset(wine_b, chlorides < 0.15)
+wine_SC = wine_base
+
+wine_6 = subset(wine_base, quality == 6)
+wine_5 = subset(wine_base, quality == 5)
+wine_4 = subset(wine_base, quality == 4)
+wine_3 = subset(wine_base, quality == 3)
+wine_2 = subset(wine_base, quality == 2)
+wine_1 = subset(wine_base, quality == 1)
+```
+``` {r echo=FALSE}
+print('chlorides summary of Quality 6')
+summary(wine_6$chlorides)
+
+print('chlorides summary of Quality 5')
+summary(wine_5$chlorides)
+
+print('chlorides summary of Quality 4')
+summary(wine_4$chlorides)
+
+print('chlorides summary of Quality 3')
+summary(wine_3$chlorides)
+
+print('chlorides summary of Quality 2')
+summary(wine_2$chlorides)
+
+print('chlorides summary of Quality 1')
+summary(wine_1$chlorides)
+```
+
+On the contrary, if sulphate goes higher, as quality is higher.
+
+```{r sulphates_grouping_by_quality}
+summary(wine_6$sulphates)
+summary(wine_5$sulphates)
+summary(wine_4$sulphates)
+summary(wine_3$sulphates)
+summary(wine_2$sulphates)
+summary(wine_1$sulphates)
+```
+
+
+
+## Distribution of chlorides/sulphates as per quality
+
+According two plot above, it seems that chlorides/sulphates have a relationship with quality.
+This plot is to show it together. However, it is still not easy to know it from plot, we will revisit it in 'Final plot'
+
+ * As chlorides is negative relationship with quality, we multiply * -1
+   - It is to located wines, sulphates to upper-right as it have lower chlorides
+
+```{r echo=FALSE}
+wine_base$chlorides_1 = wine_base$chlorides * (-1)
+ggplot(wine_base, aes(x=sulphates, y=chlorides_1, group=quality, color=quality)) +
+  geom_point(alpha = 0.5) +
+  xlab('sulphates (g / cm^3)') +
+  ylab('-1 X chlorides (g / cm^3)')
+```
+
+ * Still not easy to observe relationship between quality and chlorides/sulphates
+ * To observe more, it is grouped by quality
+ * It seems that they have some distribution as per quality
+ 
+```{r echo=FALSE}
+wine_base$chlorides_1 = wine_base$chlorides * (-1)
+ggplot(wine_base, aes(x=sulphates, y=chlorides_1, group=quality, color=quality)) +
+  facet_wrap(~quality) +
+  geom_point(alpha = 0.5) +
+  xlab('sulphates (g / cm^3)') +
+  ylab('-1 X chlorides (g / cm^3)')
+```
+
+ * To observe trend of chlorides/sulphates, add trend line by using geom_smooth()
+ * Observed that inclination is changing as per quality
+   - it is changed to positive as per higher quality
+
+```{r echo=FALSE}
+wine_base$chlorides_1 = wine_base$chlorides * (-1)
+ggplot(wine_base, aes(x=sulphates, y=chlorides_1, group=quality, color=quality)) +
+  facet_wrap(~quality) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = 'lm') +
+  xlab('sulphates (g / cm^3)') +
+  ylab('-1 X chlorides (g / cm^3)')
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Multivariate Analysis
+
+## Quality is related with chlorides and sulphates
+In previous Bivariate Analysis, it seems that chlorides and sulphates have no relationship.
+However, after we remove outliers of chlorides and sulphates,
+we could observe that it impact on quality.
+
+ * However, not easy to know it from plot relationship quality and chlorides/sulphates
+
+## Analysis/Distribution of chlorides/sulphates as per quality
+The trend of chlorides/sulphates is changed as per quality.
+As quality is goes higher, it is moved to positive from negative
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Final Plot and Summary
+
+## Wine quality and volatile.acidity/citric.acid
+
+ * Quality goes higher, both volatile.acidity/citric.acid goes to narrow range
+ * Quality 3, 4 have wide range of volatile.acidity/citric.acid
+ 
+ * As volatile.acidity is negative relationship with quality, we multiply * -1, to locate to upper-right
+
+```{r echo=FALSE}
+wine$volatile.acidity_1 = wine$volatile.acidity * (-1)
+ggplot(wine, aes(x=volatile.acidity_1, y=citric.acid, color=quality)) +
+  facet_wrap( ~ quality) +
+  geom_point(alpha = 0.2) +
+  geom_boxplot(alpha=0.1) +
+  ggtitle('Changing volatile.acidity/citric.acid by quality') +
+  ylab('citric.acid (g / cm^3)') +
+  xlab('-1 X volatile.acidity (g / cm^3)')
+```
+
+## Wine quality and alcohol/density
+ * Higher alcohol percetage in quality 6
+ * Quality 3, 4 and 5, have wide range of density/alcohol
+
+```{r echo=FALSE}
+ggplot(wine, aes(x=density, y=alcohol, color=quality)) +
+  facet_wrap(~quality) +
+  geom_point(alpha=0.5) +
+  geom_boxplot(alpha=0.1) +
+  ggtitle('Changing density/alcohol by quality') +
+  xlab('Density (g / cm^3)') +
+  ylab('Alcohol [%]')
+```
+
+## Wine quality and chlorides/sulphates
+ * Now, we can see that as per qulity goes higher, the relationship of chlorides/sulphates is changing to positively
+ * From the six plot below, we can know that chlorides/sulphates should be mixed a certation ratio to get better quality
+
+ * To observe it, we cleaned data like below
+   - Remove outliers like below.
+     + '1st Qu' < chlorides < '3rd Qu'
+     + '1st Qu' < sulphates < '3rd Qu' 
+   - As chlorides is negative relationship with quality, we multiply * -1
+     + It is to located higher chlorides/sulphates to upper-right
+```{r echo=FALSE}
+wine_SC$chlorides_1 = wine_SC$chlorides * (-1)
+
+ggplot(wine_SC, aes(x=sulphates, y=chlorides_1, group=quality, color=quality)) +
+  facet_wrap( ~ quality) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method="lm") +
+  ggtitle('Changing relationship between chlorides/sulphates by quality') +
+  ylab('citric.acid (g / cm^3)') +
+  xlab('-1 X volatile.acidity (g / cm^3)')
+```
+
+# Reflection
+## Ratio of chlorides/sulphates for better quality
+  * Hope to understand more regarding ratio of chlorides/sulphates to be better quality
+  * However, the number of higher quality wine, is too smal to analyze it
+
+## Hard to find rule of quality
+  * We found some point what make wine's quality is better
+  * Not easy to figure out particular rule of wine's quality
+  * It seems there is a kind of combination of attributes to define quality
+
+## Hard to draw plot what I want
+  * In Final Plot, I hope to draw line between mean/median as per different quality
+  * After I spent over few hours, I realized that it is not possible
