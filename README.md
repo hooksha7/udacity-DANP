@@ -18,7 +18,7 @@ The program is to educate people as Data Analyst, it is consist of two term.
  * Part 5 Congratulations and Next Steps
 
 ## Term 2, Part 6~10
- * [Part 6 Welcome to Term 2!](udacity-DAND/Part 6 Welcome to Term 2!/Project_ Test a Perceptual Phenomenon/Test a Perceptual Phenomenon.html)
+ * [Part 6 Welcome to Term 2!](Part 6 Welcome to Term 2!/Project_ Test a Perceptual Phenomenon/Test a Perceptual Phenomenon.html)
  * Part 7 Exploratory Data Analysis
  * Part 8 Data Wrangling
  * Part 9 Data Story Telling
