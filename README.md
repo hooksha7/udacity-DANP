@@ -1,14 +1,10 @@
-# Hi Everyone :-)
-
-Thanks for visiting, here is all of my projects for Udacity/Data Analyst Nanodegree Program
-
-ByeongKeon Kim (skysign at gmail.com)
-
 # My Projects for Udacity/Data Analyst Nanodegree Program
 
 This repository contains all of my projects for Udacity/Data Analyst Nanodegree Program,
 And projects are written python, jupyter notebook, R-Studio and Tableau.
 The program is to educate people as Data Analyst, it is consist of two term.
+
+ByeongKeon Kim (skysign at gmail.com)
 
 ## Term 1, Part 1~5
  * Part 1  Welcome to Term 1!
